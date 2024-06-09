@@ -910,12 +910,14 @@ void ParNewGeneration::handle_promotion_failed(GenCollectedHeap* gch, ParScanThr
   NOT_PRODUCT(Universe::heap()->reset_promotion_should_fail();)
 }
 
+// 开始parNew垃圾回收
 void ParNewGeneration::collect(bool   full,
                                bool   clear_all_soft_refs,
                                size_t size,
                                bool   is_tlab) {
   assert(full || size > 0, "otherwise we don't want to collect");
 
+  // 获取堆空间的指针
   GenCollectedHeap* gch = GenCollectedHeap::heap();
 
   _gc_timer->register_gc_start();
@@ -1012,6 +1014,7 @@ void ParNewGeneration::collect(bool   full,
   // Can  the mt_degree be set later (at run_task() time would be best)?
   rp->set_active_mt_degree(active_workers);
   ReferenceProcessorStats stats;
+  // 处理引用
   if (rp->processing_is_mt()) {
     ParNewRefProcTaskExecutor task_executor(*this, thread_state_set);
     stats = rp->process_discovered_references(&is_alive, &keep_alive,
@@ -1082,6 +1085,7 @@ void ParNewGeneration::collect(bool   full,
 
   SpecializationStats::print();
 
+  // 将当前引用列表 append 到原来的pending链表中，以便ReferenceHandler线程的善后处理
   rp->set_enqueuing_is_done(true);
   if (rp->processing_is_mt()) {
     ParNewRefProcTaskExecutor task_executor(*this, thread_state_set);

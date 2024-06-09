@@ -458,6 +458,7 @@ JVM_END
 JVM_ENTRY_NO_ENV(void, JVM_GC(void))
   JVMWrapper("JVM_GC");
   if (!DisableExplicitGC) {
+    // 只有允许显式GC，才会真正执行垃圾回收
     Universe::heap()->collect(GCCause::_java_lang_system_gc);
   }
 JVM_END

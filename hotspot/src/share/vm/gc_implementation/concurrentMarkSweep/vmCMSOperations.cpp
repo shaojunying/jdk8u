@@ -212,10 +212,12 @@ void VM_CMS_Final_Remark::doit() {
 
 // VM operation to invoke a concurrent collection of a
 // GenCollectedHeap heap.
+// 
 void VM_GenCollectFullConcurrent::doit() {
   assert(Thread::current()->is_VM_thread(), "Should be VM thread");
   assert(GCLockerInvokesConcurrent || ExplicitGCInvokesConcurrent, "Unexpected");
 
+  // 获取堆引用
   GenCollectedHeap* gch = GenCollectedHeap::heap();
   if (_gc_count_before == gch->total_collections()) {
     // The "full" of do_full_collection call below "forces"
@@ -228,6 +230,7 @@ void VM_GenCollectFullConcurrent::doit() {
     assert(SafepointSynchronize::is_at_safepoint(),
       "We can only be executing this arm of if at a safepoint");
     GCCauseSetter gccs(gch, _gc_cause);
+    // 执行一个full GC
     gch->do_full_collection(gch->must_clear_all_soft_refs(),
                             0 /* collect only youngest gen */);
   } // Else no need for a foreground young gc
